@@ -38,9 +38,9 @@ safe_runcmd() {
  cmd=$@;
  $cmd;
  error=$?;
- if [ $error != 0 ]; then
-    ui_print "Error when executing command: '$command'. Aborting...";
-    abort "Error code: $error";
+ if [ "$error" != 0 ]; then
+    ui_print "Error when executing command: '$cmd'. Aborting...";
+    abort "Error Code: $error";
  fi;
 }
 
@@ -53,10 +53,10 @@ unzip -o "$ZIPFILE";
 if [ $? != 0 -o -z "$(ls /tmp/vendor_unlocker/tools)" ]; then
   abort "Unzip failed. Aborting...";
 fi;
-sgdisk-op5=/tmp/vendor_unlocker/tools/sgdisk-op5;
-chmod 755 ${sgdisk-op5};
+sgdisk=/tmp/vendor_unlocker/tools/sgdisk-op5;
+chmod 755 $sgdisk;
 
-ui_print "Vendor Unlocker by kylothow @ xda-developers";
+ui_print "Vendor Partition Unlocker by kylothow @ xda-developers";
 ui_print " ";
 ui_print "Credits:"
 ui_print "  AnyKernel2 Backend by osm0sis @ xda-developers";
@@ -64,7 +64,6 @@ ui_print "  sgdisk-op5 by codeworkx @ xda-developers";
 ui_print " ";
 umount /system 2>/dev/null;
 mount -o ro -t auto /system;
-test -f /system/system/build.prop && root=/system;
 
 ui_print "Checking device...";
 for i in 1 2 3 4; do
@@ -82,12 +81,12 @@ fi;
 if [ ! -e "$VENDOR" ]; then
   ui_print "Vendor partition does not exist.";
   ui_print " ";
-  ui_print "Using last_parti as vendor...";
+  ui_print "Using 'last_parti' as 'vendor'...";
   ui_print "> Changing typecode to '8300 Linux filesystem'";
-  command="${sgdisk-op5} --typecode=6:8300 $BLOCKDEV";
+  command="$sgdisk --typecode=6:8300 $BLOCKDEV";
   safe_runcmd $command;
-  ui_print "> Changing name to 'vendor'"
-  command="${sgdisk-op5} --change-name=6:vendor $BLOCKDEV";
+  ui_print "> Changing name to 'vendor'";
+  command="$sgdisk --change-name=6:vendor $BLOCKDEV";
   safe_runcmd $command;
   ui_print " ";
   ui_print "Vendor partition created!";
@@ -98,8 +97,6 @@ fi;
 cleanup;
 
 umount /system;
-ui_print " ";
-ui_print "Done!";
 ui_print " ";
 
 exit 0;
